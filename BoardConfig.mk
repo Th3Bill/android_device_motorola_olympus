@@ -36,6 +36,7 @@ TARGET_BOARD_PLATFORM := tegra
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_CPU_SMP := true
+TARGET_ARCH:= arm
 TARGET_ARCH_VARIANT := armv7-a
 TARGET_ARCH_VARIANT_CPU := cortex-a9
 TARGET_ARCH_VARIANT_FPU := vfpv3-d16
@@ -49,6 +50,18 @@ TARGET_BOOTANIMATION_PRELOAD := true
 TARGET_BOOTANIMATION_TEXTURE_CACHE := false
 TARGET_BOOTANIMATION_USE_RGB565 := true
 
+# Kernel configuration for inline building
+TARGET_KERNEL_CONFIG := tegra_olympus_cm10_defconfig
+TARGET_PREBUILT_KERNEL := device/motorola/olympus/kernel
+
+OLYMPUS_WIFI_MODULE:
+	make -C kernel/motorola/olympus/wifi-module/open-src/src/dhd/linux/ \
+	ARCH="arm" CROSS_COMPILE="arm-eabi-" LINUXSRCDIR=kernel/olympus/ \
+	LINUXBUILDDIR=$(KERNEL_OUT) \
+	LINUXVER=$(shell strings "$(KERNEL_OUT)/vmlinux"|grep '2.6.*MB860'|tail -n1) \
+	BCM_INSTALLDIR="$(KERNEL_MODULES_OUT)"
+
+TARGET_KERNEL_MODULES := OLYMPUS_WIFI_MODULE
 
 BOARD_KERNEL_CMDLINE :=
 BOARD_KERNEL_BASE := 0x10000000

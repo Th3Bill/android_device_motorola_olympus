@@ -80,3 +80,7 @@ debug.sf.electron_frames=36
 
 #hwui blacklist
 hwui.use.blacklist=true
+
+# ADB Debugging
+ro.debuggable=1
+persist.service.adb.enable=1 

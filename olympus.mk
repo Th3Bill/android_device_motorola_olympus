@@ -27,7 +27,8 @@ PRODUCT_COPY_FILES += \
     device/moto/olympus/init.olympus.rc:root/init.olympus.rc \
     device/moto/olympus/init.trace.rc:root/init.trace.rc \
     device/moto/olympus/init.olympus.usb.rc:root/init.olympus.usb.rc \
-    device/moto/olympus/ueventd.olympus.rc:root/ueventd.olympus.rc
+    device/moto/olympus/ueventd.olympus.rc:root/ueventd.olympus.rc \
+    device/moto/olympus/fstab.olympus:root/fstab.olympus
 
 ## (2) Also get non-open-source GSM-specific aspects if available
 $(call inherit-product-if-exists, vendor/moto/olympus/olympus-vendor.mk)

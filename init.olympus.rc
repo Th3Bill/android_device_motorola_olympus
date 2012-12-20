@@ -12,6 +12,8 @@ on init
     mkdir /storage/sdcard1 0000 system system
     symlink /storage/sdcard0 /sdcard
     symlink /storage/sdcard0 /mnt/sdcard
+    symlink /storage/sdcard1 /emmc
+    symlink /storage/sdcard1 /mnt/emmc
     mkdir /mnt/usbdisk_1.0 0000 system system
     mkdir /mnt/usbdisk_1.1 0000 system system
     mkdir /mnt/usbdisk_1.2 0000 system system
@@ -26,11 +28,6 @@ on init
 
 on fs
 # mount mtd partitions
-    # Mount /system rw first to give the filesystem a chance to save a checkpoint
-    mount ext4 /dev/block/mmcblk0p12 /system noatime nodiratime wait ro barrier=1
-    mount ext4 /dev/block/mmcblk0p16 /data nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
-    mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev noatime nodiratime wait barrier=1 noauto_da_alloc
-    mount ext4 /dev/block/mmcblk0p13 /osh nodev noatime nodiratime wait barrier=1 noauto_da_alloc
 
     exec /system/bin/logwrapper /system/bin/pds_perm_fix.sh
 
