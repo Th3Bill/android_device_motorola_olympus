@@ -30,13 +30,13 @@ BOARD_USES_GENERIC_AUDIO := false
 # inherit from the proprietary version
 -include vendor/moto/olympus/BoardConfigVendor.mk
 
+TARGET_ARCH := arm
 TARGET_NO_BOOTLOADER := true
 TARGET_BOOTLOADER_BOARD_NAME := olympus
 TARGET_BOARD_PLATFORM := tegra
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_CPU_SMP := true
-TARGET_ARCH:= arm
 TARGET_ARCH_VARIANT := armv7-a
 TARGET_ARCH_VARIANT_CPU := cortex-a9
 TARGET_ARCH_VARIANT_FPU := vfpv3-d16
@@ -51,14 +51,13 @@ TARGET_BOOTANIMATION_TEXTURE_CACHE := false
 TARGET_BOOTANIMATION_USE_RGB565 := true
 
 # Kernel configuration for inline building
-TARGET_KERNEL_CONFIG := tegra_olympus_cm10_defconfig
-TARGET_PREBUILT_KERNEL := device/motorola/olympus/kernel
+TARGET_KERNEL_CONFIG := tegra_olympus_cm9_defconfig
 
 OLYMPUS_WIFI_MODULE:
-	make -C kernel/motorola/olympus/wifi-module/open-src/src/dhd/linux/ \
-	ARCH="arm" CROSS_COMPILE="arm-eabi-" LINUXSRCDIR=kernel/olympus/ \
-	LINUXBUILDDIR=$(KERNEL_OUT) \
-	LINUXVER=$(shell strings "$(KERNEL_OUT)/vmlinux"|grep '2.6.*MB860'|tail -n1) \
+	make -C kernel/moto/olympus/wifi-module/wlan/osrc/open-src/src/dhd/linux/ \
+	ARCH="arm" CROSS_COMPILE="arm-eabi-" LINUXSRCDIR=~/cm9/kernel/moto/olympus/ \
+	LINUXBUILDDIR=$(KERNEL_OUT) PLATFORM_DIR=~/cm9 \
+	KERNEL_SRC=$PLATFORM_DIR/kernel/moto/olympus ANDROID_BUILD_TOP=/$PLATFORM_DIR \
 	BCM_INSTALLDIR="$(KERNEL_MODULES_OUT)"
 
 TARGET_KERNEL_MODULES := OLYMPUS_WIFI_MODULE
@@ -129,6 +128,9 @@ WIFI_DRIVER_SOCKET_IFACE    := eth0
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
+BOARD_BLUEDROID_VENDOR_CONF := device/moto/olympus/bluetooth/vnd_olympus.txt
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/moto/olympus/bluetooth
+BOARD_BLUETOOTH_USES_HCIATTACH_PROPERTY := true
 
 #Camera
 TARGET_USE_MOTO_CUSTOM_CAMERA_PARAMETERS := true
@@ -139,6 +141,7 @@ BOARD_EGL_CFG := device/moto/olympus/config/egl.cfg
 COMMON_GLOBAL_CFLAGS += -DMISSING_EGL_EXTERNAL_IMAGE -DMISSING_EGL_PIXEL_FORMAT_YV12 -DMISSING_GRALLOC_BUFFERS -DEGL_ALWAYS_ASYNC -DBINDER_COMPAT
 USE_OPENGL_RENDERER := true
 BOARD_NO_ALLOW_DEQUEUE_CURRENT_BUFFER := true
+BOARD_EGL_NEEDS_LEGACY_FB := true
 
 # Avoid the generation of ldrcc instructions
 NEED_WORKAROUND_CORTEX_A9_745320 := true

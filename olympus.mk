@@ -24,14 +24,22 @@ $(call inherit-product, device/common/gps/gps_us_supl.mk)
 
 ## (1) First, the most specific values, i.e. the aspects that are specific to GSM
 PRODUCT_COPY_FILES += \
-    device/moto/olympus/init.olympus.rc:root/init.olympus.rc \
-    device/moto/olympus/init.trace.rc:root/init.trace.rc \
-    device/moto/olympus/init.olympus.usb.rc:root/init.olympus.usb.rc \
-    device/moto/olympus/ueventd.olympus.rc:root/ueventd.olympus.rc \
-    device/moto/olympus/fstab.olympus:root/fstab.olympus
+    device/moto/olympus/root/init.olympus.rc:root/init.olympus.rc \
+    system/core/rootdir/init.trace.rc:root/init.trace.rc \
+    device/moto/olympus/root/init.olympus.usb.rc:root/init.olympus.usb.rc \
+    device/moto/olympus/root/ueventd.olympus.rc:root/ueventd.olympus.rc \
+    device/moto/olympus/root/fstab.olympus:root/fstab.olympus
 
 ## (2) Also get non-open-source GSM-specific aspects if available
 $(call inherit-product-if-exists, vendor/moto/olympus/olympus-vendor.mk)
+
+## (3)  Non-GSM-specific aspects
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.telephony.sms_segment_size=160 \
+    ro.telephony.call_ring.multiple=false \
+    ro.setupwizard.enable_bypass=1 \
+    ro.url.legal=http://www.google.com/intl/%s/mobile/android/basic/phone-legal.html \
+    ro.url.legal.android_privacy=http://www.google.com/intl/%s/mobile/android/basic/privacy.html \
 
 # motorola helper scripts
 PRODUCT_COPY_FILES += \
@@ -56,43 +64,37 @@ PRODUCT_LOCALES += hdpi
 # not exactly xhdpi, but we have enough RAM, why not use it?
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 
-# copy all kernel modules under the "modules" directory to system/lib/modules
-PRODUCT_COPY_FILES += $(shell \
-    find device/moto/olympus/modules -name '*.ko' \
-    | sed -r 's/^\/?(.*\/)([^/ ]+)$$/\1\2:system\/lib\/modules\/\2/' \
-    | tr '\n' ' ')
-
-ifeq ($(TARGET_PREBUILT_KERNEL),)
-	LOCAL_KERNEL := device/moto/olympus/kernel
-else
-	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-endif
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_KERNEL):kernel
-
 $(call inherit-product-if-exists, vendor/moto/olympus/olympus-vendor.mk)
 
 $(call inherit-product, build/target/product/full_base_telephony.mk)
 
-PRODUCT_COPY_FILES += vendor/cm/prebuilt/common/bin/modelid_cfg.sh:system/bin/modelid_cfg.sh
-
+#fs tools
 PRODUCT_PACKAGES += make_ext4fs \
  			setup_fs
 
-PRODUCT_PACKAGES += Usb \
-			DockAudio \
-			Torch \
-			OlympusParts \
-			HwaSettings \
+#bluetooth
+PRODUCT_PACKAGES += l2ping \
 			hciconfig \
 			hcitool \
-			rilwrap \
-			hwcomposer.default \
-			lights.olympus \
-			camera.olympus \
+			libnetcmdiface
+
+#Audio
+PRODUCT_PACKAGES += DockAudio \
 			audio.primary.olympus \
+			audio.usb.default \
 			audio.a2dp.default
+
+#Camera and Torch
+PRODUCT_PACKAGES += Torch \
+			lights.olympus \
+			camera.olympus
+
+#Other
+PRODUCT_PACKAGES += Usb \
+			OlympusParts \
+			com.android.future.usb.accessory \
+			HwaSettings \
+			rilwrap 
 
 DEVICE_PACKAGE_OVERLAYS += device/moto/olympus/overlay
 
@@ -103,6 +105,7 @@ PRODUCT_COPY_FILES += \
     device/moto/olympus/prebuilts/liba2dp.so:system/lib/liba2dp.so \
     device/moto/olympus/config/media_codecs.xml:system/etc/media_codecs.xml \
     device/moto/olympus/config/media_profiles.xml:system/etc/media_profiles.xml 
+    device/moto/olympus/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
 #keyboard files
 PRODUCT_COPY_FILES += \
@@ -137,6 +140,12 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
+
+#debug
+PRODUCT_PROPERTY_OVERRIDES +=persist.sys.root_access=3 \
+		ro.debuggable=1 \
+		ro.secure=0 \
+		persist.service.adb.enable=1
 
 PRODUCT_NAME := full_olympus
 PRODUCT_DEVICE := olympus
